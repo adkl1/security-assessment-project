@@ -1,0 +1,190 @@
+{
+  "seed_group": 506512019,
+  "users": [
+    /* ---------- WEAK PASSWORDS ---------- */
+    {
+      "username": "weak01",
+      "password": "123456",
+      "category": "weak",
+      "totp_secret": "JBSWY3DPEHPK3PXP"
+    },
+    {
+      "username": "weak02",
+      "password": "password",
+      "category": "weak",
+      "totp_secret": "KRSXG5DSMFZSA4DP"
+    },
+    {
+      "username": "weak03",
+      "password": "qwerty",
+      "category": "weak",
+      "totp_secret": "MZXW6YTBOI======"
+    },
+    {
+      "username": "weak04",
+      "password": "111111",
+      "category": "weak",
+      "totp_secret": "ONSWG4TFOQ======"
+    },
+    {
+      "username": "weak05",
+      "password": "abc123",
+      "category": "weak",
+      "totp_secret": "IFBEGRCFIZDUQSKK"
+    },
+    {
+      "username": "weak06",
+      "password": "letmein",
+      "category": "weak",
+      "totp_secret": "KBQWYZLFOJWG6YTB"
+    },
+    {
+      "username": "weak07",
+      "password": "welcome",
+      "category": "weak",
+      "totp_secret": "MFZXIYLCMFXGK3DF"
+    },
+    {
+      "username": "weak08",
+      "password": "iloveyou",
+      "category": "weak",
+      "totp_secret": "NB2W45DFOIZA===="
+    },
+    {
+      "username": "weak09",
+      "password": "admin",
+      "category": "weak",
+      "totp_secret": "GAYTEMZUGU======"
+    },
+    {
+      "username": "weak10",
+      "password": "506512019",
+      "category": "weak",
+      "totp_secret": "ORSXG5A="
+    },
+
+    /* ---------- MEDIUM PASSWORDS ---------- */
+    {
+      "username": "med01",
+      "password": "Winter2024",
+      "category": "medium",
+      "totp_secret": "JZXXE3DPNZSXG5A="
+    },
+    {
+      "username": "med02",
+      "password": "Login_123",
+      "category": "medium",
+      "totp_secret": "KNSWG4TFON2A===="
+    },
+    {
+      "username": "med03",
+      "password": "Passw0rd!",
+      "category": "medium",
+      "totp_secret": "MFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "med04",
+      "password": "HelloWorld9",
+      "category": "medium",
+      "totp_secret": "NB2HI4DTHIXS===="
+    },
+    {
+      "username": "med05",
+      "password": "User2023!",
+      "category": "medium",
+      "totp_secret": "OBSWY3DPEHPK3PXP"
+    },
+    {
+      "username": "med06",
+      "password": "SecureMe12",
+      "category": "medium",
+      "totp_secret": "PFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "med07",
+      "password": "Admin#77",
+      "category": "medium",
+      "totp_secret": "QNSWG4TFON2A===="
+    },
+    {
+      "username": "med08",
+      "password": "Portal_88",
+      "category": "medium",
+      "totp_secret": "RFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "med09",
+      "password": "Auth2022!",
+      "category": "medium",
+      "totp_secret": "SFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "med10",
+      "password": "System99",
+      "category": "medium",
+      "totp_secret": "TNSWG4TFON2A===="
+    },
+
+    /* ---------- STRONG PASSWORDS ---------- */
+    {
+      "username": "strong01",
+      "password": "X7!pR9$eTqL@4Z",
+      "category": "strong",
+      "totp_secret": "UFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "strong02",
+      "password": "M@8KzQ#2D!9cW7",
+      "category": "strong",
+      "totp_secret": "VNSWG4TFON2A===="
+    },
+    {
+      "username": "strong03",
+      "password": "4Zx!L2@P9T#qE",
+      "category": "strong",
+      "totp_secret": "WFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "strong04",
+      "password": "Q9$@Z8!xW7M2",
+      "category": "strong",
+      "totp_secret": "XNSWG4TFON2A===="
+    },
+    {
+      "username": "strong05",
+      "password": "T!8Z@7Pq2X#9",
+      "category": "strong",
+      "totp_secret": "YFRGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "strong06",
+      "password": "E2$Q9@X7#ZP!",
+      "category": "strong",
+      "totp_secret": "ZNSWG4TFON2A===="
+    },
+    {
+      "username": "strong07",
+      "password": "9@Z!2#PX7Q$E",
+      "category": "strong",
+      "totp_secret": "AERGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "strong08",
+      "password": "XQ9#@2!7ZP$E",
+      "category": "strong",
+      "totp_secret": "BENSG4TFON2A===="
+    },
+    {
+      "username": "strong09",
+      "password": "Z!@9QPX7#2$E",
+      "category": "strong",
+      "totp_secret": "CERGGZDFMZTWQ2LK"
+    },
+    {
+      "username": "strong10",
+      "password": "7!@ZPX#2$9QE",
+      "category": "strong",
+      "totp_secret": "DENSG4TFON2A===="
+    }
+  ]
+}
