@@ -1,47 +1,69 @@
 from flask import Flask, request, redirect, url_for, session, render_template_string
+import sqlite3
 
 app = Flask(__name__)
 GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
 
+DB_NAME = "server.db"
+
+
+# functions for db so that each client thread has a direct access
+def get_db():
+    return sqlite3.connect(DB_NAME)
+
+
+def init_db():
+    with get_db() as db:
+        db.execute("""CREATE TABLE IF NOT EXISTS USERS 
+                    (username TEXT PRIMARY KEY,
+                    password BLOB NOT NULL)""")
+
+
 USERNAME = "test"
 PASSWORD = "test123"
 
-LOGIN_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
-    <form method="post">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>
-"""
+LOGIN_HTML = ""
+REGISTER_HTML = ""
+
+with open("login.html", "r") as file:
+    LOGIN_HTML = file.read()
+with open("register.html", "r") as file:
+    REGISTER_HTML = file.read()
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
-        password = request.form["password"]
+        password = request.form["password"].encode('utf-8')
 
-        if username == USERNAME and password == PASSWORD:
-            session["user"] = username
+        with get_db() as db:
+            cur = db.execute("SELECT password FROM USERS WHERE username = ?", (username,))
+            row = cur.fetchone()
+        if row and row[0] == password:
+            session['user'] = username
             return redirect(url_for("test"))
 
         return render_template_string(LOGIN_HTML, error="Invalid credentials")
 
     return render_template_string(LOGIN_HTML)
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"].encode("utf-8")
+
+        try:
+            with get_db() as db:
+                db.execute("INSERT INTO USERS (username, password) VALUES (?, ?)", (username, password))
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            return render_template_string(REGISTER_HTML, error="Username already exists")
+
+    return render_template_string(REGISTER_HTML)
 
 
 @app.route("/test")
@@ -50,6 +72,7 @@ def test():
         return redirect(url_for("login"))
 
     return f"Welcome, {session['user']}!"
+
 
 if __name__ == "__main__":
     app.run()
