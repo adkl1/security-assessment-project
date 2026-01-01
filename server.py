@@ -73,6 +73,5 @@ def test():
 
     return f"Welcome, {session['user']}!"
 
-
 if __name__ == "__main__":
     app.run()
