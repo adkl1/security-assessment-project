@@ -1,23 +1,12 @@
 
 import json
 import sqlite3
-import hashlib
-import bcrypt
-import secrets
-import base64
-import os
-from argon2 import PasswordHasher
+from encryptions import encrypt_bcrypt, encrypt_sha256,encrypt_aragon2
+
 
 DB_PATH = "server.db"
 USERS_JSON = "users.json"
 
-PEPPER = os.environ.get("AUTH_PEPPER", "")
-ph = PasswordHasher(time_cost=1, memory_cost=64 * 1024, parallelism=1)
-
-def sha256_hash(password: str):
-    salt = secrets.token_bytes(16)
-    h = hashlib.sha256((PEPPER + password).encode() + salt).hexdigest()
-    return h, base64.b64encode(salt).decode()
 
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
@@ -41,19 +30,13 @@ for u in data["users"]:
     password = u["password"]
     totp_enabled = 1 if u.get("totp_secret") else 0
 
-    # sha256
-    sha_hash, sha_salt = sha256_hash(password)
+sha_hash , sha_salt = encrypt_sha256(password)
 
-    # bcrypt
-    bcrypt_hash = bcrypt.hashpw(
-        (PEPPER + password).encode(),
-        bcrypt.gensalt(rounds=12)
-    ).decode()
+bcrypt_hash = encrypt_bcrypt(password)
 
-    # argon2
-    argon2_hash = ph.hash(PEPPER + password)
+argon2_hash = encrypt_aragon2(password)
 
-    cur.execute("""
+cur.execute("""
     INSERT OR REPLACE INTO users
     VALUES (?, ?, ?, ?, ?, ?)
     """, (
@@ -68,4 +51,4 @@ for u in data["users"]:
 conn.commit()
 conn.close()
 
-print("users.db created with 3 hashes per user")
+print("server.db created with 3 hashes per user")
