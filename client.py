@@ -55,26 +55,14 @@ def try_login(username, password, hash_mode):
 
 def bruteforce(username, hash_mode):
     words = load_words(PASSWORDS_FILE)
-    count = 0
+    tries = 0
 
     for password in password_generator(words, max_attempts=150000):
         if try_login(username, password, hash_mode):
-            return count
-        count += 1
+            return tries
+        tries += 1
 
     return -1
-
-
-def password_spraying(users, hash_mode):
-    successful_cracks = {}
-    with open(PASSWORDS_FILE, "r") as file:
-        passwords = file.readlines()
-        for line in passwords:
-            line = line.rstrip("\n")
-            for user in users:
-                if try_login(user, line, hash_mode):
-                    successful_cracks[user] = line
-    return successful_cracks
 
 
 def get_user_list():
@@ -85,6 +73,30 @@ def get_user_list():
         user_list.append(user['username'])
     user_list = user_list[:5]
     return user_list
+
+@measure_resources(interval=0.01)
+def password_spraying(hash_mode):
+    successful_cracks = {}
+    tries = 0
+    users = get_user_list()
+    start = time.time()
+    words = load_words(PASSWORDS_FILE)
+    for password in password_generator(words, max_attempts=150000):
+        pass_start = time.time()
+        for user in users:
+            tries += 1
+            if try_login(user, password, hash_mode):
+                successful_cracks[user] = time.time() - pass_start
+                break
+
+    end = time.time() - start
+    user_entries = []
+    for user in get_user_list():
+        if user in successful_cracks.keys():
+            user_entry = {"Username": user, "Time_elapsed": successful_cracks[user], "Status": True}
+            user_entries.append(user_entry)
+
+    return tries, end,len(successful_cracks),user_entries
 
 @measure_resources(interval=0.01)
 def preform_bruteforce(hash_mode):
@@ -107,14 +119,11 @@ def preform_bruteforce(hash_mode):
     # also return analytics
     return total_tries, end, count_success, user_entries
 
-def preform_spraying(hash_mode):
-    pass
-
-
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
     with open("BF_NO_DEF.json","w") as file:
         for curr_hash in hash_modes:
+            # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
             # also add analytics
             total_tries, end, count_success, user_entries = result
@@ -127,6 +136,19 @@ def main():
                           "average_mem_use":  round(avg_mem,2),
                           "User_entries": user_entries}
             file.write(json.dumps(brute_json))
+
+            # preform password spraying on the current hash encryption method
+            result, avg_cpu, avg_mem = password_spraying(curr_hash)
+            total_tries, end, count_success, user_entries = result
+            spray_json = {"hash_mode": curr_hash,
+                          "Total_tries": total_tries,
+                          "Time_elapsed": round(end, 3),
+                          "Tries_per_sec": int(total_tries / end),
+                          "Success_rate": round((count_success / len(get_user_list()) * 100), 2),
+                          "average_cpu_use": round(avg_cpu, 2),
+                          "average_mem_use": round(avg_mem, 2),
+                          "User_entries": user_entries}
+            file.write(json.dumps(spray_json))
 
 
 if __name__ == "__main__":
