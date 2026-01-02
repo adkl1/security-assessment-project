@@ -12,17 +12,6 @@ DB_NAME = "server.db"
 def get_db():
     return sqlite3.connect(DB_NAME)
 
-
-def init_db():
-    with get_db() as db:
-        db.execute("""CREATE TABLE IF NOT EXISTS USERS 
-                    (username TEXT PRIMARY KEY,
-                    password BLOB NOT NULL)""")
-
-
-USERNAME = "test"
-PASSWORD = "test123"
-
 LOGIN_HTML = ""
 REGISTER_HTML = ""
 
