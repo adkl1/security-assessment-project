@@ -1,7 +1,6 @@
 {
   "seed_group": 506512019,
   "users": [
-    /* ---------- WEAK PASSWORDS ---------- */
     {
       "username": "weak01",
       "password": "123456",
@@ -63,7 +62,6 @@
       "totp_secret": "ORSXG5A="
     },
 
-    /* ---------- MEDIUM PASSWORDS ---------- */
     {
       "username": "med01",
       "password": "Winter2024",
@@ -124,8 +122,6 @@
       "category": "medium",
       "totp_secret": "TNSWG4TFON2A===="
     },
-
-    /* ---------- STRONG PASSWORDS ---------- */
     {
       "username": "strong01",
       "password": "X7!pR9$eTqL@4Z",

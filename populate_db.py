@@ -11,7 +11,7 @@ from argon2 import PasswordHasher
 DB_PATH = "server.db"
 USERS_JSON = "users.json"
 
-PEPPER = os.environ.get("AUTH_PEPPER", "")
+PEPPER = "5"
 ph = PasswordHasher(time_cost=1, memory_cost=64 * 1024, parallelism=1)
 
 def sha256_hash(password: str):
