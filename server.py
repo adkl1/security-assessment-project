@@ -26,23 +26,26 @@ with open("register.html", "r") as file:
 def login():
     if request.method == "POST":
         username = request.form["username"]
-        password = request.form["password"].encode('utf-8')
-        encryption = request.form["hash_mode"].encode('utf-8')
+        password = request.form["password"]
+        encryption = request.form["hash_mode"]
 
         with get_db() as db:
-            cur = db.execute("SELECT password FROM USERS WHERE username = ?", (username,))
+            cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
             if encryption == "sha256":
-                if (verify_sha256(password,row[0],row[1])):
+                if (verify_sha256(password,row[1],row[2])):
                     session['user'] = username
+                    session['encryption'] = encryption
                     return redirect(url_for("test"))
             if encryption == "bcrypt":
-                if(verify_bcrypt(password,row[2])):
+                if(verify_bcrypt(password,row[3])):
                     session['user'] = username
+                    session['encryption'] = encryption
                     return redirect(url_for("test"))
             if encryption == "argon2":
-                if(verify_argon2(password,row[3])):
+                if(verify_argon2(password,row[4])):
                     session['user'] = username
+                    session['encryption'] = encryption
                     return redirect(url_for("test"))
 
         return render_template_string(LOGIN_HTML, error="Invalid credentials")
@@ -71,7 +74,7 @@ def test():
     if "user" not in session:
         return redirect(url_for("login"))
 
-    return f"Welcome, {session['user']}! with encrypted password {encryption}}"
+    return f"Welcome, {session['user']}! with encrypted password {session['encryption']}"
 
 if __name__ == "__main__":
     app.run()
