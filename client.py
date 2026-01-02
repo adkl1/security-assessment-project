@@ -11,7 +11,7 @@ def load_words(path, limit=10000):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return [w.strip() for w in f if w.strip()][:limit]
 
-def password_generator(words, max_attempts=50000):
+def password_generator(words, max_attempts=150000):
     count = 0
 
     for w in words:
@@ -57,7 +57,7 @@ def bruteforce(username, hash_mode):
     words = load_words(PASSWORDS_FILE)
     count = 0
 
-    for password in password_generator(words, max_attempts=50000):
+    for password in password_generator(words, max_attempts=150000):
         if try_login(username, password, hash_mode):
             return count
         count += 1
@@ -83,7 +83,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[:12]
+    user_list = user_list[11:12]
     return user_list
 
 

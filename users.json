@@ -69,67 +69,67 @@
     },
     {
       "username": "medium01",
-      "password": "77777knickers",
+      "password": "password123456",
       "category": "medium",
       "totp_secret": "2LUW754RM54HLZFS"
     },
     {
       "username": "medium02",
-      "password": "santiagochampion",
+      "password": "passwordcougars",
       "category": "medium",
       "totp_secret": "7FEVA4NOXLOOTNLN"
     },
     {
       "username": "medium03",
-      "password": "prettyraiders",
+      "password": "123456monkey",
       "category": "medium",
       "totp_secret": "HH4GB6M2KWYFYEIR"
     },
     {
       "username": "medium04",
-      "password": "11111enigma",
+      "password": "123456beech",
       "category": "medium",
       "totp_secret": "JSUBJLKPIKFXAAJB"
     },
     {
       "username": "medium05",
-      "password": "warrenbeavis",
+      "password": "1234563ki42x",
       "category": "medium",
       "totp_secret": "EB2RHJXGYANPVA35"
     },
     {
       "username": "medium06",
-      "password": "eminemkissing",
+      "password": "12345678password",
       "category": "medium",
       "totp_secret": "WMJ2HYQ5EDY7OE6N"
     },
     {
       "username": "medium07",
-      "password": "blueskyillini",
+      "password": "12345678killer",
       "category": "medium",
       "totp_secret": "VVGWQW2D7MNTDHIU"
     },
     {
       "username": "medium08",
-      "password": "cardinal1122",
+      "password": "12345678picnic",
       "category": "medium",
       "totp_secret": "3G4JXOUF5LBK6MZG"
     },
     {
       "username": "medium09",
-      "password": "tornado1972",
+      "password": "1234master",
       "category": "medium",
       "totp_secret": "BCPXM2VIIFO5JHJD"
     },
     {
       "username": "medium10",
-      "password": "stargatedonkey",
+      "password": "1234detect",
       "category": "medium",
       "totp_secret": "OJJ75SQFXBEUKNTF"
     },
     {
       "username": "hard01",
-      "password": "larrysteelerskitty",
+      "password": "1234eyphed",
       "category": "hard",
       "totp_secret": "TXIIGSPRIF5UFIH6"
     },
