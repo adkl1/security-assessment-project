@@ -5,16 +5,18 @@ import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
 app = Flask(__name__)
-#engable rate limiter
+# enable rate limiter with username as key
+def username_key():
+    # Use username as the rate-limit key
+    return request.form.get("username", "anonymous")
 limiter = Limiter(
-    key_func=get_remote_address,
+    key_func=username_key,
     app=app
 )
 GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
 
 DB_NAME = "server.db"
-
 
 # functions for db so that each client thread has a direct access
 def get_db():
@@ -28,20 +30,13 @@ with open("login.html", "r") as file:
 with open("register.html", "r") as file:
     REGISTER_HTML = file.read()
 
-user_login_tries = {}
-
 @app.route("/login", methods=["GET", "POST"])
-@limiter.limit("20 per second")
+@limiter.limit("100 per minute")
 def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         encryption = request.form["hash_mode"]
-
-        if username in user_login_tries.keys():
-            user_login_tries[username] += 1
-        else:
-            user_login_tries[username] = 1
         print(username,password,encryption)
 
         with get_db() as db:
