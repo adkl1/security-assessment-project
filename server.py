@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, url_for, session, render_template_string
 import sqlite3
+from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
 app = Flask(__name__)
 GROUP_SEED = "506512019"
@@ -26,13 +27,23 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"].encode('utf-8')
+        encryption = request.form["hash_mode"].encode('utf-8')
 
         with get_db() as db:
             cur = db.execute("SELECT password FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
-        if row and row[0] == password:
-            session['user'] = username
-            return redirect(url_for("test"))
+            if encryption == "sha256":
+                if (verify_sha256(password,row[0],row[1])):
+                    session['user'] = username
+                    return redirect(url_for("test"))
+            if encryption == "bcrypt":
+                if(verify_bcrypt(password,row[2])):
+                    session['user'] = username
+                    return redirect(url_for("test"))
+            if encryption == "argon2":
+                if(verify_argon2(password,row[3])):
+                    session['user'] = username
+                    return redirect(url_for("test"))
 
         return render_template_string(LOGIN_HTML, error="Invalid credentials")
 
@@ -60,7 +71,7 @@ def test():
     if "user" not in session:
         return redirect(url_for("login"))
 
-    return f"Welcome, {session['user']}!"
+    return f"Welcome, {session['user']}! with encrypted password {encryption}}"
 
 if __name__ == "__main__":
     app.run()

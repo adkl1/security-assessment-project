@@ -1,8 +1,22 @@
 <h2>Login</h2>
-{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
 <form method="post">
     <input name="username" placeholder="Username" required><br>
+
     <input type="password" name="password" placeholder="Password" required><br>
-    <button>Login</button>
+
+    <label for="hash_mode">Encryption method:</label><br>
+    <select name="hash_mode" id="hash_mode" required>
+        <option value="sha256">SHA-256 + Salt</option>
+        <option value="bcrypt">bcrypt</option>
+        <option value="argon2id">Argon2id</option>
+    </select><br><br>
+
+    <button type="submit">Login</button>
 </form>
+
 <a href="/register">Register</a>
