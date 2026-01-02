@@ -57,35 +57,40 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
+    user_list = user_list[10]
     return user_list
 
 
 def preform_bruteforce(hash_mode):
-    count = 0
+    total_tries = 0
+    count_success = 0
     start = time.time()
+    user_entries = []
     for user in get_user_list():
         user_start = time.time()
         tries = bruteforce(user, hash_mode)
         user_end = time.time() - user_start
         status = "Success" if tries > 0 else "Fail"
-        print(f"Username:'{user}', Time elapsed:{user_end}, Hash:{hash_mode}, Status:{status}")
+        user_entry = {"Username": user, "Time_elapsed": user_end, "Hash_mode": hash_mode, "Status": status}
+        user_entries.append(user_entry)
         if tries > 0:
-            count += tries
+            total_tries += tries
+            count_success += 1
     end = time.time() - start
-    return count, end
+    # also return analytics
+    return total_tries, end, count_success, user_entries
 
 
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2"]
-    preform_bruteforce(hash_modes[0])
-    # users = ["weak01","weak02","weak03","weak04","weak05"]
-    # if bruteforce(get_user_list()[22], hash-modes[0]) > 0:
-    #     print("Cracked")
-    # else:
-    #     print("Failed")
-    # dic = password_spraying(users,hash-modes[0])
-    # # print(dic)
-    # print(get_user_list())
+    total_tries, end, count_success, user_entries = preform_bruteforce(hash_modes[0])
+    # also add analytics
+    brute_json = {"Total_tries": total_tries,
+                  "Time_elapsed": end,
+                  "Tries_per_sec": int(total_tries / end),
+                  "Success_rate": (count_success / len(get_user_list()) * 100),
+                  "User_entries": user_entries}
+    print(brute_json)
 
 
 if __name__ == "__main__":
