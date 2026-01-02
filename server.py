@@ -29,6 +29,8 @@ def login():
         password = request.form["password"]
         encryption = request.form["hash_mode"]
 
+        print(username,password,encryption)
+
         with get_db() as db:
             cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
@@ -45,16 +47,18 @@ def login():
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
-            if encryption == "bcrypt":
+            elif encryption == "bcrypt":
                 if verify_bcrypt(password, bcrypt):
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
-            if encryption == "argon2id":
+            elif encryption == "argon2id":
                 if verify_argon2(password, argon):
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
+            else:
+                return render_template_string(LOGIN_HTML, error="Invalid hash")
 
         return render_template_string(LOGIN_HTML, error="Invalid credentials")
 

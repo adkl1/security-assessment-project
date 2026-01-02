@@ -46,7 +46,6 @@ def try_login(username, password, hash_mode):
                 "hash_mode": hash_mode
             }
         )
-
         return "Welcome" in response.text or "test" in response.url
 
     except requests.RequestException as e:
@@ -113,10 +112,8 @@ def preform_spraying(hash_mode):
 
 
 def main():
-    hash_modes = ["sha256", "bcrypt", "argon2"]
-    
+    hash_modes = ["sha256", "bcrypt", "argon2id"]
     with open("BF_NO_DEF.json","w") as file:
-        my_hash = hash_modes[0]
         for curr_hash in hash_modes:
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
             # also add analytics
