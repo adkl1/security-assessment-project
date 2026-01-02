@@ -1,11 +1,12 @@
-from flask import Flask, request, redirect, url_for, session, render_template_string
+from flask import Flask, request, redirect, url_for, session, render_template_string, render_template, abort
 import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
 app = Flask(__name__)
 GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
-
+FAILED_ATTEMPTS = {}   # { username: count }
+MAX_TRIES = 5
 DB_NAME = "server.db"
 
 
@@ -29,40 +30,58 @@ def login():
         password = request.form["password"]
         encryption = request.form["hash_mode"]
 
-        print(username,password,encryption)
+        FAILED_ATTEMPTS.setdefault(username, 0)
+
+        # Don't print passwords
+        print(username, password, encryption)
+
+        if FAILED_ATTEMPTS[username] >= MAX_TRIES:
+            return render_template_string(
+                LOGIN_HTML,
+                error="Account locked after too many attempts"
+            )
 
         with get_db() as db:
             cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
-            if row is None:
-                return render_template_string(LOGIN_HTML, error="Invalid credentials")
-            user = row[0]
-            sha = row[1]
-            salt = row[2]
-            bcrypt = row[3]
-            argon = row[4]
 
-            if encryption == "sha256":
-                if verify_sha256(password, sha, salt):
-                    session['user'] = username
-                    session['encryption'] = encryption
-                    return redirect(url_for("test"))
-            elif encryption == "bcrypt":
-                if verify_bcrypt(password, bcrypt):
-                    session['user'] = username
-                    session['encryption'] = encryption
-                    return redirect(url_for("test"))
-            elif encryption == "argon2id":
-                if verify_argon2(password, argon):
-                    session['user'] = username
-                    session['encryption'] = encryption
-                    return redirect(url_for("test"))
-            else:
-                return render_template_string(LOGIN_HTML, error="Invalid hash")
+        if row is None:
+            # count as a failed attempt too (optional but consistent)
+            FAILED_ATTEMPTS[username] += 1
+            return render_template_string(LOGIN_HTML, error="Invalid credentials")
 
-        return render_template_string(LOGIN_HTML, error="Invalid credentials")
+        user = row[0]
+        sha = row[1]
+        salt = row[2]
+        bcrypt_hash = row[3]
+        argon_hash = row[4]
+
+        ok = False
+        if encryption == "sha256":
+            ok = verify_sha256(password, sha, salt)
+        elif encryption == "bcrypt":
+            ok = verify_bcrypt(password, bcrypt_hash)
+        elif encryption == "argon2id":
+            ok = verify_argon2(password, argon_hash)
+        else:
+            return render_template_string(LOGIN_HTML, error="Invalid hash")
+
+        if ok:
+            session["user"] = username
+            session["encryption"] = encryption
+            FAILED_ATTEMPTS[username] = 0
+            return redirect(url_for("test"))
+
+        FAILED_ATTEMPTS[username] += 1
+        left = MAX_TRIES - FAILED_ATTEMPTS[username]
+
+        if left <= 0:
+            return render_template_string(LOGIN_HTML, error="Account locked after too many attempts")
+
+        return render_template_string(LOGIN_HTML, error=f"Invalid credentials ({left} attempts left)")
 
     return render_template_string(LOGIN_HTML)
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -88,5 +107,12 @@ def test():
 
     return f"Welcome, {session['user']}! with encrypted password {session['encryption']}"
 
+@app.route("/reset_lockout", methods=["POST"])
+def reset_lockout():
+    token = request.form.get("token", "")
+    if token != GROUP_SEED:
+        abort(403)
+    FAILED_ATTEMPTS.clear()
+    return "OK", 200
 if __name__ == "__main__":
     app.run(threaded=True)
