@@ -52,7 +52,7 @@ def login():
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
-            if encryption == "argon2":
+            if encryption == "argon2id":
                 if verify_argon2(password, argon):
                     session['user'] = username
                     session['encryption'] = encryption
