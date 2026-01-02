@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+from analytics import measure_resources
 
 LOGIN_URL = "http://127.0.0.1:5000/login"
 PASSWORDS_FILE = "passwords.txt"
@@ -83,10 +84,10 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[11:12]
+    user_list = user_list[:5]
     return user_list
 
-
+@measure_resources(interval=0.01)
 def preform_bruteforce(hash_mode):
     total_tries = 0
     count_success = 0
@@ -98,7 +99,7 @@ def preform_bruteforce(hash_mode):
         tries = bruteforce(user, hash_mode)
         user_end = time.time() - user_start
         status = "Success" if tries > 0 else "Fail"
-        user_entry = {"Username": user, "Time_elapsed": user_end, "Hash_mode": hash_mode, "Status": status}
+        user_entry = {"Username": user, "Time_elapsed": user_end, "Status": status}
         user_entries.append(user_entry)
         if tries > 0:
             total_tries += tries
@@ -107,17 +108,28 @@ def preform_bruteforce(hash_mode):
     # also return analytics
     return total_tries, end, count_success, user_entries
 
+def preform_spraying(hash_mode):
+    pass
+
 
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2"]
-    total_tries, end, count_success, user_entries = preform_bruteforce(hash_modes[0])
-    # also add analytics
-    brute_json = {"Total_tries": total_tries,
-                  "Time_elapsed": end,
-                  "Tries_per_sec": int(total_tries / end),
-                  "Success_rate": (count_success / len(get_user_list()) * 100),
-                  "User_entries": user_entries}
-    print(brute_json)
+    
+    with open("BF_NO_DEF.json","w") as file:
+        my_hash = hash_modes[0]
+        for curr_hash in hash_modes:
+            result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
+            # also add analytics
+            total_tries, end, count_success, user_entries = result
+            brute_json = {"hash_mode": curr_hash,
+                          "Total_tries": total_tries,
+                          "Time_elapsed": round(end,3),
+                          "Tries_per_sec": int(total_tries / end),
+                          "Success_rate": round((count_success / len(get_user_list()) * 100),2),
+                          "average_cpu_use": round(avg_cpu,2),
+                          "average_mem_use":  round(avg_mem,2),
+                          "User_entries": user_entries}
+            file.write(json.dumps(brute_json))
 
 
 if __name__ == "__main__":
