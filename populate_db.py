@@ -30,13 +30,13 @@ for u in data["users"]:
     password = u["password"]
     totp_enabled = 1 if u.get("totp_secret") else 0
 
-sha_hash , sha_salt = encrypt_sha256(password)
+    sha_hash , sha_salt = encrypt_sha256(password)
 
-bcrypt_hash = encrypt_bcrypt(password)
+    bcrypt_hash = encrypt_bcrypt(password)
 
-argon2_hash = encrypt_aragon2(password)
+    argon2_hash = encrypt_aragon2(password)
 
-cur.execute("""
+    cur.execute("""
     INSERT OR REPLACE INTO users
     VALUES (?, ?, ?, ?, ?, ?)
     """, (
