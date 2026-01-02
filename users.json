@@ -1,186 +1,192 @@
 {
   "seed_group": 506512019,
+  "generated_at": "2026-01-02T11:17:51.604937Z",
+  "source_password_list": "10k-most-common.txt",
+  "generation_rules": {
+    "basic": "single token from list",
+    "medium": "concatenation of 2 tokens from list (no other changes)",
+    "hard": "concatenation of 3 tokens from list (no other changes)"
+  },
   "users": [
     {
-      "username": "weak01",
-      "password": "123456",
-      "category": "weak",
-      "totp_secret": "JBSWY3DPEHPK3PXP"
+      "username": "basic01",
+      "password": "syracuse",
+      "category": "basic",
+      "totp_secret": "LT5UUK6AEH4WPTRU"
     },
     {
-      "username": "weak02",
-      "password": "password",
-      "category": "weak",
-      "totp_secret": "KRSXG5DSMFZSA4DP"
+      "username": "basic02",
+      "password": "letmein2",
+      "category": "basic",
+      "totp_secret": "GG2BWXICWBB5TCYF"
     },
     {
-      "username": "weak03",
-      "password": "qwerty",
-      "category": "weak",
-      "totp_secret": "MZXW6YTBOI======"
+      "username": "basic03",
+      "password": "qwertyui",
+      "category": "basic",
+      "totp_secret": "IKCSNRY4YFB3JCSF"
     },
     {
-      "username": "weak04",
-      "password": "111111",
-      "category": "weak",
-      "totp_secret": "ONSWG4TFOQ======"
+      "username": "basic04",
+      "password": "mountain",
+      "category": "basic",
+      "totp_secret": "3OCT6HP7QMQ74MRH"
     },
     {
-      "username": "weak05",
-      "password": "abc123",
-      "category": "weak",
-      "totp_secret": "IFBEGRCFIZDUQSKK"
+      "username": "basic05",
+      "password": "softball",
+      "category": "basic",
+      "totp_secret": "ELZHUHME65WV67MV"
     },
     {
-      "username": "weak06",
-      "password": "letmein",
-      "category": "weak",
-      "totp_secret": "KBQWYZLFOJWG6YTB"
+      "username": "basic06",
+      "password": "champion",
+      "category": "basic",
+      "totp_secret": "CI4VUJL65LHLATCQ"
     },
     {
-      "username": "weak07",
-      "password": "welcome",
-      "category": "weak",
-      "totp_secret": "MFZXIYLCMFXGK3DF"
+      "username": "basic07",
+      "password": "565656",
+      "category": "basic",
+      "totp_secret": "6HAEBS6LY4PSETMR"
     },
     {
-      "username": "weak08",
-      "password": "iloveyou",
-      "category": "weak",
-      "totp_secret": "NB2W45DFOIZA===="
+      "username": "basic08",
+      "password": "mushroom",
+      "category": "basic",
+      "totp_secret": "OE5FBPVFJSN26MA3"
     },
     {
-      "username": "weak09",
-      "password": "admin",
-      "category": "weak",
-      "totp_secret": "GAYTEMZUGU======"
+      "username": "basic09",
+      "password": "bridget",
+      "category": "basic",
+      "totp_secret": "QMDXQTGTFANMBSTM"
     },
     {
-      "username": "weak10",
-      "password": "506512019",
-      "category": "weak",
-      "totp_secret": "ORSXG5A="
+      "username": "basic10",
+      "password": "hang",
+      "category": "basic",
+      "totp_secret": "6QJZ73VXOLSYBE4Z"
     },
-
     {
-      "username": "med01",
-      "password": "Winter2024",
+      "username": "medium01",
+      "password": "77777knickers",
       "category": "medium",
-      "totp_secret": "JZXXE3DPNZSXG5A="
+      "totp_secret": "2LUW754RM54HLZFS"
     },
     {
-      "username": "med02",
-      "password": "Login_123",
+      "username": "medium02",
+      "password": "santiagochampion",
       "category": "medium",
-      "totp_secret": "KNSWG4TFON2A===="
+      "totp_secret": "7FEVA4NOXLOOTNLN"
     },
     {
-      "username": "med03",
-      "password": "Passw0rd!",
+      "username": "medium03",
+      "password": "prettyraiders",
       "category": "medium",
-      "totp_secret": "MFRGGZDFMZTWQ2LK"
+      "totp_secret": "HH4GB6M2KWYFYEIR"
     },
     {
-      "username": "med04",
-      "password": "HelloWorld9",
+      "username": "medium04",
+      "password": "11111enigma",
       "category": "medium",
-      "totp_secret": "NB2HI4DTHIXS===="
+      "totp_secret": "JSUBJLKPIKFXAAJB"
     },
     {
-      "username": "med05",
-      "password": "User2023!",
+      "username": "medium05",
+      "password": "warrenbeavis",
       "category": "medium",
-      "totp_secret": "OBSWY3DPEHPK3PXP"
+      "totp_secret": "EB2RHJXGYANPVA35"
     },
     {
-      "username": "med06",
-      "password": "SecureMe12",
+      "username": "medium06",
+      "password": "eminemkissing",
       "category": "medium",
-      "totp_secret": "PFRGGZDFMZTWQ2LK"
+      "totp_secret": "WMJ2HYQ5EDY7OE6N"
     },
     {
-      "username": "med07",
-      "password": "Admin#77",
+      "username": "medium07",
+      "password": "blueskyillini",
       "category": "medium",
-      "totp_secret": "QNSWG4TFON2A===="
+      "totp_secret": "VVGWQW2D7MNTDHIU"
     },
     {
-      "username": "med08",
-      "password": "Portal_88",
+      "username": "medium08",
+      "password": "cardinal1122",
       "category": "medium",
-      "totp_secret": "RFRGGZDFMZTWQ2LK"
+      "totp_secret": "3G4JXOUF5LBK6MZG"
     },
     {
-      "username": "med09",
-      "password": "Auth2022!",
+      "username": "medium09",
+      "password": "tornado1972",
       "category": "medium",
-      "totp_secret": "SFRGGZDFMZTWQ2LK"
+      "totp_secret": "BCPXM2VIIFO5JHJD"
     },
     {
-      "username": "med10",
-      "password": "System99",
+      "username": "medium10",
+      "password": "stargatedonkey",
       "category": "medium",
-      "totp_secret": "TNSWG4TFON2A===="
+      "totp_secret": "OJJ75SQFXBEUKNTF"
     },
     {
-      "username": "strong01",
-      "password": "X7!pR9$eTqL@4Z",
-      "category": "strong",
-      "totp_secret": "UFRGGZDFMZTWQ2LK"
+      "username": "hard01",
+      "password": "larrysteelerskitty",
+      "category": "hard",
+      "totp_secret": "TXIIGSPRIF5UFIH6"
     },
     {
-      "username": "strong02",
-      "password": "M@8KzQ#2D!9cW7",
-      "category": "strong",
-      "totp_secret": "VNSWG4TFON2A===="
+      "username": "hard02",
+      "password": "catherinweird1qazxsw2",
+      "category": "hard",
+      "totp_secret": "UHTOB4PEPOAUBIR4"
     },
     {
-      "username": "strong03",
-      "password": "4Zx!L2@P9T#qE",
-      "category": "strong",
-      "totp_secret": "WFRGGZDFMZTWQ2LK"
+      "username": "hard03",
+      "password": "phishslayerjessie",
+      "category": "hard",
+      "totp_secret": "K6GFE6ER34OLNQPH"
     },
     {
-      "username": "strong04",
-      "password": "Q9$@Z8!xW7M2",
-      "category": "strong",
-      "totp_secret": "XNSWG4TFON2A===="
+      "username": "hard04",
+      "password": "chroniclifehackjanine",
+      "category": "hard",
+      "totp_secret": "XDVOIE255U47VH7W"
     },
     {
-      "username": "strong05",
-      "password": "T!8Z@7Pq2X#9",
-      "category": "strong",
-      "totp_secret": "YFRGGZDFMZTWQ2LK"
+      "username": "hard05",
+      "password": "testingtooldonnie",
+      "category": "hard",
+      "totp_secret": "UKOERMCWGPZPVRST"
     },
     {
-      "username": "strong06",
-      "password": "E2$Q9@X7#ZP!",
-      "category": "strong",
-      "totp_secret": "ZNSWG4TFON2A===="
+      "username": "hard06",
+      "password": "thuglifecameronkatana",
+      "category": "hard",
+      "totp_secret": "DXZDIQD2KAG3VDWU"
     },
     {
-      "username": "strong07",
-      "password": "9@Z!2#PX7Q$E",
-      "category": "strong",
-      "totp_secret": "AERGGZDFMZTWQ2LK"
+      "username": "hard07",
+      "password": "shamrocksprintpacman",
+      "category": "hard",
+      "totp_secret": "Z4F7IXNWI7YSOOKH"
     },
     {
-      "username": "strong08",
-      "password": "XQ9#@2!7ZP$E",
-      "category": "strong",
-      "totp_secret": "BENSG4TFON2A===="
+      "username": "hard08",
+      "password": "silver11223344pandora",
+      "category": "hard",
+      "totp_secret": "VKJBOLIFIK2BNMXL"
     },
     {
-      "username": "strong09",
-      "password": "Z!@9QPX7#2$E",
-      "category": "strong",
-      "totp_secret": "CERGGZDFMZTWQ2LK"
+      "username": "hard09",
+      "password": "oooooonikkiyyyyyy",
+      "category": "hard",
+      "totp_secret": "SJPNW3EWCWBE3O47"
     },
     {
-      "username": "strong10",
-      "password": "7!@ZPX#2$9QE",
-      "category": "strong",
-      "totp_secret": "DENSG4TFON2A===="
+      "username": "hard10",
+      "password": "bruinsoregonrainbow",
+      "category": "hard",
+      "totp_secret": "KXLB3GDH6E4TQDCF"
     }
   ]
 }
