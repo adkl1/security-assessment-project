@@ -1,15 +1,16 @@
-
 import json
 import sqlite3
-from encryptions import encrypt_bcrypt, encrypt_sha256,encrypt_aragon2
-
+from encryptions import encrypt_bcrypt, encrypt_sha256, encrypt_aragon2
 
 DB_PATH = "server.db"
 USERS_JSON = "users.json"
 
-
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
+
+# delete old data
+with open(DB_PATH, "w") as f:
+    pass
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
@@ -30,7 +31,7 @@ for u in data["users"]:
     password = u["password"]
     totp_enabled = 1 if u.get("totp_secret") else 0
 
-    sha_hash , sha_salt = encrypt_sha256(password)
+    sha_hash, sha_salt = encrypt_sha256(password)
 
     bcrypt_hash = encrypt_bcrypt(password)
 

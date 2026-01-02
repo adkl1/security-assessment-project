@@ -32,18 +32,28 @@ def login():
         with get_db() as db:
             cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
+            print(type(row))
+            print(row)
+            if row is None:
+                return render_template_string(LOGIN_HTML, error="Invalid credentials")
+            user = row[0]
+            sha = row[1]
+            salt = row[2]
+            bcrypt = row[3]
+            argon = row[4]
+
             if encryption == "sha256":
-                if (verify_sha256(password,row[1],row[2])):
+                if verify_sha256(password, sha, salt):
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
             if encryption == "bcrypt":
-                if(verify_bcrypt(password,row[3])):
+                if verify_bcrypt(password, bcrypt):
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
             if encryption == "argon2":
-                if(verify_argon2(password,row[4])):
+                if verify_argon2(password, argon):
                     session['user'] = username
                     session['encryption'] = encryption
                     return redirect(url_for("test"))
