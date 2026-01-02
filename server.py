@@ -1,8 +1,15 @@
 from flask import Flask, request, redirect, url_for, session, render_template_string
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
 app = Flask(__name__)
+#engable rate limiter
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app
+)
 GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
 
@@ -21,14 +28,20 @@ with open("login.html", "r") as file:
 with open("register.html", "r") as file:
     REGISTER_HTML = file.read()
 
+user_login_tries = {}
 
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("20 per second")
 def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         encryption = request.form["hash_mode"]
 
+        if username in user_login_tries.keys():
+            user_login_tries[username] += 1
+        else:
+            user_login_tries[username] = 1
         print(username,password,encryption)
 
         with get_db() as db:

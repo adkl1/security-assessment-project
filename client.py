@@ -90,7 +90,7 @@ def password_spraying(hash_mode):
                 successful_cracks[user] = time.time() - pass_start
                 break
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or time.time() - start // 60 >= 2:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) // 60 >= 2:
             break
 
     end = time.time() - start
@@ -122,7 +122,7 @@ def preform_bruteforce(hash_mode):
         else:
             total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or time.time() - start//60 >= 2:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start)//60 >= 2:
             break
     end = time.time() - start
     # also return analytics
