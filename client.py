@@ -44,10 +44,7 @@ def password_spraying(filename,users):
 
 
 def main():
-    if bruteforce("passwords.txt", "user"):
-        print("Password cracked")
-    else:
-        print("Unsuccessful")
+    password_spraying()
 
 
 if __name__ == "__main__":

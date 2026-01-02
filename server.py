@@ -12,9 +12,6 @@ DB_NAME = "server.db"
 def get_db():
     return sqlite3.connect(DB_NAME)
 
-USERNAME = "test"
-PASSWORD = "test123"
-
 LOGIN_HTML = ""
 REGISTER_HTML = ""
 
