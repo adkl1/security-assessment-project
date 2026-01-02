@@ -32,8 +32,6 @@ def login():
         with get_db() as db:
             cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
             row = cur.fetchone()
-            print(type(row))
-            print(row)
             if row is None:
                 return render_template_string(LOGIN_HTML, error="Invalid credentials")
             user = row[0]
@@ -87,4 +85,4 @@ def test():
     return f"Welcome, {session['user']}! with encrypted password {session['encryption']}"
 
 if __name__ == "__main__":
-    app.run()
+    app.run(threaded=True)

@@ -1,7 +1,6 @@
 {
   "seed_group": 506512019,
-  "generated_at": "2026-01-02T11:17:51.604937Z",
-  "source_password_list": "10k-most-common.txt",
+  "source_password_list": "password.txt",
   "generation_rules": {
     "basic": "single token from list",
     "medium": "concatenation of 2 tokens from list (no other changes)",
