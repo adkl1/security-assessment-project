@@ -57,7 +57,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[10]
+    user_list = user_list[:6]
     return user_list
 
 
