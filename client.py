@@ -59,11 +59,13 @@ def try_login(username, password, hash_mode):
 def bruteforce(username, hash_mode):
     words = load_words(PASSWORDS_FILE)
     tries = 0
-
+    start = time.time()
     for password in password_generator(words):
         if try_login(username, password, hash_mode):
             return tries
         tries += 1
+        if(time.time()-start) >= TIME_LIMIT:
+            return -1
     return -1
 
 
