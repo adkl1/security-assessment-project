@@ -179,7 +179,7 @@ def preform_bruteforce(hash_mode):
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
     hash_modes = hash_modes[:2]
-    with open("NO_DEF.json","w") as file:
+    with open("LOCKOUT_DEF.json","w") as file:
         full_json = {}
         for curr_hash in hash_modes:
             # preform bruteforce on the current hash encryption method
