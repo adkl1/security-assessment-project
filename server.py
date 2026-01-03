@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, request, redirect, url_for, session, render_template_string
 import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
@@ -13,6 +15,7 @@ DB_NAME = "server.db"
 def get_db():
     return sqlite3.connect(DB_NAME)
 
+
 LOGIN_HTML = ""
 REGISTER_HTML = ""
 
@@ -21,6 +24,9 @@ with open("login.html", "r") as file:
 with open("register.html", "r") as file:
     REGISTER_HTML = file.read()
 
+FAILED_ATTEMPTS = {}  # { username: count }
+MAX_TRIES = 5
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -28,8 +34,11 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
         encryption = request.form["hash_mode"]
-
-        print(username,password,encryption)
+        FAILED_ATTEMPTS.setdefault(username, 0)
+        print(username, password, encryption)
+        FAILED_ATTEMPTS[username] += 1
+        if FAILED_ATTEMPTS[username] >= MAX_TRIES:
+            return render_template_string(LOGIN_HTML, error="{"+f'"username: "{username}","captcha_required":true, "captcha_token"' + "}")
 
         with get_db() as db:
             cur = db.execute("SELECT * FROM USERS WHERE username = ?", (username,))
@@ -87,6 +96,20 @@ def test():
         return redirect(url_for("login"))
 
     return f"Welcome, {session['user']}! with encrypted password {session['encryption']}"
+
+
+@app.route("/admin/get_captcha_token",methods=["GET"])
+def captcha():
+    username = request.form['username']
+    group_seed = request.args.get("group_seed")
+    if group_seed != GROUP_SEED:
+        return "Invalid Group seed"
+    if username not in FAILED_ATTEMPTS:
+        return "No captcha needed for this user"
+    FAILED_ATTEMPTS[username] = 0
+    time.sleep(3)
+    return "OK"
+
 
 if __name__ == "__main__":
     app.run(threaded=True)
