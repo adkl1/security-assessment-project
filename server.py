@@ -88,7 +88,7 @@ def register():
 
         try:
             with get_db() as db:
-                db.execute("INSERT INTO USERS (username, password) VALUES (?, ?)", (username, password))
+                db.execute("INSERT INTO USERS VALUES (?, ?, ?, ?, ?, ?)", (username, password,password,password,password,0))
             return redirect(url_for("login"))
         except sqlite3.IntegrityError:
             return render_template_string(REGISTER_HTML, error="Username already exists")
