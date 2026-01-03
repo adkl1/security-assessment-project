@@ -3,15 +3,24 @@ import json
 import time
 from analytics import measure_resources
 
-LOGIN_URL = "http://127.0.0.1:5000/login"
-PASSWORDS_FILE = "passwords.txt"
-USERS_JSON = "users.json"
-MAX_ATTEMPTS_PER_USER = 50000
-MAX_ATTEMPTS_PER_SESSION = 1000000
-TIME_LIMIT = 120 # in seconds
+data = {}
+#defaults
+with open("client.config", "r") as f:
+    data = json.load(f)
+try:
+    LOGIN_URL = data["LOGIN_URL"]
+    PASSWORDS_FILE = data["PASSWORDS_FILE"]
+    USERS_JSON = data["USERS_JSON"]
+    MAX_ATTEMPTS_PER_USER = data["MAX_ATTEMPTS_PER_USER"]
+    MAX_ATTEMPTS_PER_SESSION = data["MAX_ATTEMPTS_PER_SESSION"]
+    TIME_LIMIT = data["TIME_LIMIT"] # in seconds
+    hash_modes = data["HASH_MODES"]
+except:
+    print("Error loading config file")
+
 session = requests.Session()
 
-def load_words(path, limit=10000):
+def load_words(path, limit=MAX_ATTEMPTS_PER_SESSION):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return [w.strip() for w in f if w.strip()][:limit]
 
@@ -144,7 +153,6 @@ def preform_bruteforce(hash_mode):
     return total_tries, end, count_success, user_entries
 
 def main():
-    hash_modes = ["sha256", "bcrypt", "argon2id"]
     with open("NO_DEF.json","w") as file:
         full_json = {}
         for curr_hash in hash_modes:
