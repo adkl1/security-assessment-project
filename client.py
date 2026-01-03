@@ -8,6 +8,7 @@ PASSWORDS_FILE = "passwords.txt"
 USERS_JSON = "users.json"
 MAX_ATTEMPTS_PER_USER = 50000
 MAX_ATTEMPTS_PER_SESSION = 1000000
+TIME_LIMIT = 3600
 session = requests.Session()
 
 def load_words(path, limit=10000):
@@ -72,7 +73,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[:5]
+    user_list = user_list[:2]
     return user_list
 
 @measure_resources(interval=0.01)
@@ -81,18 +82,19 @@ def password_spraying(hash_mode):
     tries = 0
     users = get_user_list()
     start = time.time()
+    pass_start = time.time()
     words = load_words(PASSWORDS_FILE)
     for password in password_generator(words):
-        pass_start = time.time()
         for user in users:
             tries += 1
             if try_login(user, password, hash_mode):
                 successful_cracks[user] = time.time() - pass_start
+                users.remove(user)
                 break
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or time.time() - start // 60 >= 2:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
-
+    print(successful_cracks)
     end = time.time() - start
     user_entries = []
     for user in get_user_list():
@@ -122,7 +124,7 @@ def preform_bruteforce(hash_mode):
         else:
             total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or time.time() - start//60 >= 2:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
     end = time.time() - start
     # also return analytics
@@ -130,34 +132,35 @@ def preform_bruteforce(hash_mode):
 
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
-    with open("BF_NO_DEF.json","w") as file:
+    hash_modes = hash_modes[:2]
+    with open("NO_DEF.json","w") as file:
+        full_json = {}
         for curr_hash in hash_modes:
             # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
             # also add analytics
             total_tries, end, count_success, user_entries = result
-            brute_json = {"hash_mode": curr_hash,
-                          "Total_tries": total_tries,
+            brute_json = {"Total_tries": total_tries,
                           "Time_elapsed": round(end,3),
                           "Tries_per_sec": int(total_tries / end),
                           "Success_rate": round((count_success / len(get_user_list()) * 100),2),
                           "average_cpu_use": round(avg_cpu,2),
                           "average_mem_use":  round(avg_mem,2),
                           "User_entries": user_entries}
-            file.write(json.dumps(brute_json))
 
             # preform password spraying on the current hash encryption method
             result, avg_cpu, avg_mem = password_spraying(curr_hash)
             total_tries, end, count_success, user_entries = result
-            spray_json = {"hash_mode": curr_hash,
-                          "Total_tries": total_tries,
+            spray_json = {"Total_tries": total_tries,
                           "Time_elapsed": round(end, 3),
                           "Tries_per_sec": int(total_tries / end),
                           "Success_rate": round((count_success / len(get_user_list()) * 100), 2),
                           "average_cpu_use": round(avg_cpu, 2),
                           "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
-            file.write(json.dumps(spray_json))
+            crack_json = {"Bruteforce":brute_json,"Password_spraying":spray_json}
+            full_json[curr_hash] = crack_json
+        file.write(json.dumps(full_json,indent=4))
 
 if __name__ == "__main__":
     main()
