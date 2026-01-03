@@ -97,8 +97,11 @@ def password_spraying(hash_mode):
     user_entries = []
     for user in get_user_list():
         if user in successful_cracks.keys():
-            user_entry = {"Username": user, "Time_elapsed": successful_cracks[user], "Status": True}
-            user_entries.append(user_entry)
+            user_entry = {"Username": user, "Time_elapsed": successful_cracks[user], "Status": "Success But Totp Block"}
+        else:
+            user_entry = {"Username": user, "Time_elapsed": -1, "Status": "Fail"}
+        user_entries.append(user_entry)
+
 
     return tries, end,len(successful_cracks),user_entries
 
@@ -113,7 +116,7 @@ def preform_bruteforce(hash_mode):
         user_start = time.time()
         tries = bruteforce(user, hash_mode)
         user_end = time.time() - user_start
-        status = "Success" if tries > 0 else "Fail"
+        status = "Success But Totp Block" if tries > 0 else "Fail"
         user_entry = {"Username": user, "Time_elapsed": user_end, "Status": status}
         user_entries.append(user_entry)
         if tries > 0:
