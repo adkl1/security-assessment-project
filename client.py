@@ -8,7 +8,7 @@ PASSWORDS_FILE = "passwords.txt"
 USERS_JSON = "users.json"
 MAX_ATTEMPTS_PER_USER = 50000
 MAX_ATTEMPTS_PER_SESSION = 1000000
-TIME_LIMIT = 3600
+TIME_LIMIT = 120 # in seconds
 session = requests.Session()
 
 def load_words(path, limit=10000):
@@ -61,12 +61,14 @@ def bruteforce(username, hash_mode):
     tries = 0
     start = time.time()
     for password in password_generator(words):
+        tries += 1  # before the check to count the current attempt
         if try_login(username, password, hash_mode):
-            return tries
-        tries += 1
-        if(time.time()-start) >= TIME_LIMIT:
-            return -1
-    return -1
+            return True, tries  # Return success status and the count
+
+        if (time.time() - start) >= TIME_LIMIT:
+            return False, tries  # count reached at timeout
+
+    return False, tries
 
 
 def get_user_list():
@@ -75,7 +77,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[:2]
+    user_list = user_list[:1]
     return user_list
 
 @measure_resources(interval=0.01)
@@ -94,7 +96,7 @@ def password_spraying(hash_mode):
                 users.remove(user)
                 break
         # check if time limit or tries limit were exceeded
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= (TIME_LIMIT)*3:
             break
     print(successful_cracks)
     end = time.time() - start
@@ -108,35 +110,41 @@ def password_spraying(hash_mode):
 
     return tries, end,len(successful_cracks),user_entries
 
+
 @measure_resources(interval=0.01)
 def preform_bruteforce(hash_mode):
     total_tries = 0
     count_success = 0
     start = time.time()
     user_entries = []
+
     for user in get_user_list():
-        print(user)
+        print(f"Testing user: {user}")
         user_start = time.time()
-        tries = bruteforce(user, hash_mode)
+        success, tries = bruteforce(user, hash_mode)
         user_end = time.time() - user_start
-        status = "Success" if tries > 0 else "Fail"
-        user_entry = {"Username": user, "Time_elapsed": round(user_end,2), "Status": status}
+        status = "Success" if success else "Fail"
+
+        user_entry = {
+            "Username": user,
+            "Time_elapsed": round(user_end, 2),
+            "Status": status
+        }
         user_entries.append(user_entry)
-        if tries > 0:
-            total_tries += tries
+        # add the actual tries, regardless of success or failure
+        total_tries += tries
+        if success:
             count_success += 1
-        else:
-            total_tries += MAX_ATTEMPTS_PER_USER
-        # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+
+        # limits
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= (TIME_LIMIT) * 3:
             break
+
     end = time.time() - start
-    # also return analytics
     return total_tries, end, count_success, user_entries
 
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
-    hash_modes = hash_modes[:2]
     with open("NO_DEF.json","w") as file:
         full_json = {}
         for curr_hash in hash_modes:
