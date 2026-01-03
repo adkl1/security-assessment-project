@@ -7,7 +7,7 @@ LOGIN_URL = "http://127.0.0.1:5000/login"
 PASSWORDS_FILE = "passwords.txt"
 USERS_JSON = "users.json"
 MAX_ATTEMPTS_PER_USER = 50000
-MAX_ATTEMPTS_PER_SESSION = 1000000
+MAX_ATTEMPTS_PER_SESSION = 200000
 session = requests.Session()
 
 def load_words(path, limit=10000):
@@ -90,7 +90,7 @@ def password_spraying(hash_mode):
                 successful_cracks[user] = time.time() - pass_start
                 break
         # check if time limit or tries limit were exceeded
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= 3600:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= 600:
             break
 
     end = time.time() - start
@@ -125,7 +125,7 @@ def preform_bruteforce(hash_mode):
         else:
             total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= 3600:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= 600:
             break
     end = time.time() - start
     # also return analytics
@@ -133,7 +133,7 @@ def preform_bruteforce(hash_mode):
 
 def main():
     hash_modes = ["sha256", "bcrypt", "argon2id"]
-    with open("BF_NO_DEF.json","w") as file:
+    with open("FULL_CRACK_TOTP.json","w") as file:
         for curr_hash in hash_modes:
             # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
