@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, url_for, session, render_template_string
 import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
+import pyotp
 
 app = Flask(__name__)
 GROUP_SEED = "506512019"
@@ -46,17 +47,23 @@ def login():
                 if verify_sha256(password, sha, salt):
                     session['user'] = username
                     session['encryption'] = encryption
-                    return redirect(url_for("test"))
+                    session["password_ok"] = True
+                    session["totp_ok"] = False
+                    return redirect(url_for("login_totp"))
             elif encryption == "bcrypt":
                 if verify_bcrypt(password, bcrypt):
                     session['user'] = username
                     session['encryption'] = encryption
-                    return redirect(url_for("test"))
+                    session["password_ok"] = True
+                    session["totp_ok"] = False
+                    return redirect(url_for("login_totp"))
             elif encryption == "argon2id":
                 if verify_argon2(password, argon):
                     session['user'] = username
                     session['encryption'] = encryption
-                    return redirect(url_for("test"))
+                    session["password_ok"] = True
+                    session["totp_ok"] = False
+                    return redirect(url_for("login_totp"))
             else:
                 return render_template_string(LOGIN_HTML, error="Invalid hash")
 
@@ -80,13 +87,45 @@ def register():
 
     return render_template_string(REGISTER_HTML)
 
+@app.route("/login_totp", methods=["GET", "POST"])
+def login_totp():
+    if not session.get("password_ok"):
+        return redirect("/login")
+
+    if request.method == "GET":
+        return "TOTP required"
+
+    code = request.form.get("code")
+
+    user_list = []
+    user_totp = ""
+    with open(USERS_JSON, "r") as f:
+        data = json.load(f)
+    for user in data['users']:
+        if user['username'] == session["user"]:
+            user_totp = user["totp_secret"]
+
+    totp = pyotp.TOTP(user_totp)
+
+    # Use server time explicitly
+    now = time.time()
+
+    if not totp.verify(code, for_time=now, valid_window=1):
+        return "Invalid TOTP code", 401
+
+    # Fully authenticated
+    session["totp_ok"] = True
+
+    return redirect("/test")
 
 @app.route("/test")
 def test():
-    if "user" not in session:
+    if "user" not in session or not session.get("password_ok") or not session.get("totp_ok"):
         return redirect(url_for("login"))
 
     return f"Welcome, {session['user']}! with encrypted password {session['encryption']}"
+
+
 
 if __name__ == "__main__":
     app.run(threaded=True)
