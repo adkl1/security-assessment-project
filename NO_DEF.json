@@ -1,0 +1,86 @@
+{
+    "sha256": {
+        "Bruteforce": {
+            "Total_tries": 3864,
+            "Time_elapsed": 15.476,
+            "Tries_per_sec": 249,
+            "Success_rate": 100.0,
+            "average_cpu_use": 23.74,
+            "average_mem_use": 31.2,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 9.934873580932617,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 5.54002046585083,
+                    "Status": "Success"
+                }
+            ]
+        },
+        "Password_spraying": {
+            "Total_tries": 3866,
+            "Time_elapsed": 14.802,
+            "Tries_per_sec": 261,
+            "Success_rate": 100.0,
+            "average_cpu_use": 18.79,
+            "average_mem_use": 31.38,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 14.790466070175171,
+                    "Status": true
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 10.908278465270996,
+                    "Status": true
+                }
+            ]
+        }
+    },
+    "bcrypt": {
+        "Bruteforce": {
+            "Total_tries": 3864,
+            "Time_elapsed": 750.191,
+            "Tries_per_sec": 5,
+            "Success_rate": 100.0,
+            "average_cpu_use": 14.09,
+            "average_mem_use": 33.25,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 472.1289403438568,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 278.0617563724518,
+                    "Status": "Success"
+                }
+            ]
+        },
+        "Password_spraying": {
+            "Total_tries": 3866,
+            "Time_elapsed": 751.16,
+            "Tries_per_sec": 5,
+            "Success_rate": 100.0,
+            "average_cpu_use": 15.9,
+            "average_mem_use": 35.32,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 751.1487984657288,
+                    "Status": true
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 556.9350581169128,
+                    "Status": true
+                }
+            ]
+        }
+    }
+}
