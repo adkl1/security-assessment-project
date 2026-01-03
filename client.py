@@ -4,6 +4,7 @@ import time
 from analytics import measure_resources
 
 LOGIN_URL = "http://127.0.0.1:5000/login"
+CAPTCHA_URL = "http://127.0.0.1:5000/admin/get_captcha_token?group_seed=506512019"
 PASSWORDS_FILE = "passwords.txt"
 USERS_JSON = "users.json"
 MAX_ATTEMPTS_PER_USER = 50000
@@ -48,6 +49,16 @@ def try_login(username, password, hash_mode):
                 "hash_mode": hash_mode
             }
         )
+        # every MAX_TRIES tries the server will lock the user until he sends a captcha get request
+        if "captcha" in response.text.lower():
+            response = session.get(
+                CAPTCHA_URL,
+                data={
+                    "username": username
+                }
+            )
+            if "ok" not in response.text.lower():
+                return False
         return "Welcome" in response.text or "test" in response.url
 
     except requests.RequestException as e:
