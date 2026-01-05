@@ -86,7 +86,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[:1]
+    user_list = user_list[::2]
     return user_list
 
 @measure_resources(interval=0.01)
