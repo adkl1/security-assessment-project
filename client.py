@@ -15,6 +15,7 @@ try:
     MAX_ATTEMPTS_PER_SESSION = data["MAX_ATTEMPTS_PER_SESSION"]
     TIME_LIMIT = data["TIME_LIMIT"]  # in seconds
     hash_modes = data["HASH_MODES"]
+    GROUP_SEED = data["GROUP_SEED"]
 except:
     print("Error loading config file")
 
@@ -56,6 +57,7 @@ def password_generator(words):
 
 def reset_lockout():
     session.post("http://127.0.0.1:5000/reset_lockout", data={"token": GROUP_SEED})
+
 
 
 def try_login(username, password, hash_mode):
@@ -145,7 +147,7 @@ def password_spraying(hash_mode):
                 locked_users.add(user)
                 continue  # IMPORTANT: skip to next user, not break
 
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT*3:
             break
 
         # optional: stop early if all users are either cracked or locked
@@ -182,7 +184,7 @@ def preform_bruteforce(hash_mode):
         if status == "Success":
             count_success += 1
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT*3:
             break
     end = time.time() - start
     # also return analytics
@@ -190,9 +192,10 @@ def preform_bruteforce(hash_mode):
 
 
 def main():
-    with open("LOCKOUT_DEF.json", "w") as file:
+    with open("LOCKOUT_DEF_report.json", "w") as file:
         full_json = {}
         for curr_hash in hash_modes:
+            reset_lockout()
             # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
             # also add analytics
@@ -204,7 +207,7 @@ def main():
                           "average_cpu_use": round(avg_cpu, 2),
                           "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
-
+            reset_lockout()
             # preform password spraying on the current hash encryption method
             result, avg_cpu, avg_mem = password_spraying(curr_hash)
             total_tries, end, count_success, user_entries = result
