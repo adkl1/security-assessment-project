@@ -2,25 +2,32 @@ from flask import Flask, request, redirect, url_for, session, render_template_st
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import sqlite3
+import json
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
 app = Flask(__name__)
 
+
+
+#defaults
+data = {"DB_NAME":"server.db","GROUPS_SEED":"123456"}
+with open("server.config", "r") as f:
+    data = json.load(f)
+
+DB_NAME = data["DB_NAME"]
+GROUP_SEED = data["GROUP_SEED"]
 
 # enable rate limiter with username as key
 def username_key():
     # Use username as the rate-limit key
     return request.form.get("username", "anonymous")
 
-
 limiter = Limiter(
     key_func=username_key,
     app=app
 )
-GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
 
-DB_NAME = "server.db"
 
 
 # functions for db so that each client thread has a direct access
