@@ -95,7 +95,7 @@ def get_user_list():
         data = json.load(f)
     for user in data['users']:
         user_list.append(user['username'])
-    user_list = user_list[:5]
+    user_list = user_list[::3]
     return user_list
 
 @measure_resources(interval=0.01)
@@ -114,7 +114,7 @@ def password_spraying(hash_mode):
                 users.remove(user)
                 break
         # check if time limit or tries limit were exceeded
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT*3:
             break
     print(successful_cracks)
     end = time.time() - start
@@ -150,7 +150,7 @@ def preform_bruteforce(hash_mode):
         if success:
             count_success += 1
         # check if time limit or tries limit were exceeded
-        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
+        if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT*3:
             break
     end = time.time() - start
     # also return analytics
