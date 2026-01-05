@@ -3,22 +3,32 @@ import json
 import time
 from analytics import measure_resources
 
-LOGIN_URL = "http://127.0.0.1:5000/login"
-PASSWORDS_FILE = "passwords.txt"
-USERS_JSON = "users.json"
-GROUP_SEED = "506512019"
-MAX_ATTEMPTS_PER_USER = 50000
-MAX_ATTEMPTS_PER_SESSION = 1000000
-TIME_LIMIT = 3600
+data = {}
+# defaults
+with open("client.config", "r") as f:
+    data = json.load(f)
+try:
+    LOGIN_URL = data["LOGIN_URL"]
+    PASSWORDS_FILE = data["PASSWORDS_FILE"]
+    USERS_JSON = data["USERS_JSON"]
+    MAX_ATTEMPTS_PER_USER = data["MAX_ATTEMPTS_PER_USER"]
+    MAX_ATTEMPTS_PER_SESSION = data["MAX_ATTEMPTS_PER_SESSION"]
+    TIME_LIMIT = data["TIME_LIMIT"]  # in seconds
+    hash_modes = data["HASH_MODES"]
+except:
+    print("Error loading config file")
+
 session = requests.Session()
 LOGIN_OK = "ok"
 LOGIN_FAIL = "fail"
 LOGIN_LOCKED = "locked"
 LOGIN_ERROR = "error"
 
-def load_words(path, limit=10000):
+
+def load_words(path, limit=MAX_ATTEMPTS_PER_SESSION):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return [w.strip() for w in f if w.strip()][:limit]
+
 
 def password_generator(words):
     count = 0
@@ -43,8 +53,10 @@ def password_generator(words):
                 if count >= MAX_ATTEMPTS_PER_USER:
                     return
 
+
 def reset_lockout():
     session.post("http://127.0.0.1:5000/reset_lockout", data={"token": GROUP_SEED})
+
 
 def try_login(username, password, hash_mode):
     try:
@@ -104,6 +116,7 @@ def get_user_list():
     user_list = user_list[:5]
     return user_list
 
+
 @measure_resources(interval=0.01)
 def password_spraying(hash_mode):
     successful_cracks = {}
@@ -132,7 +145,7 @@ def password_spraying(hash_mode):
                 locked_users.add(user)
                 continue  # IMPORTANT: skip to next user, not break
 
-        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) // 60 >= 2:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
 
         # optional: stop early if all users are either cracked or locked
@@ -145,10 +158,11 @@ def password_spraying(hash_mode):
         if user in successful_cracks.keys():
             user_entry = {"Username": user, "Time_elapsed": round(successful_cracks[user], 2), "Status": "Success"}
         else:
-            user_entry = {"Username": user, "Time_elapsed": -1, "Status": "Fail"}
+            user_entry = {"Username": user, "Time_elapsed": end, "Status": "Fail"}
         user_entries.append(user_entry)
 
     return tries, end, len(successful_cracks), user_entries
+
 
 @measure_resources(interval=0.01)
 def preform_bruteforce(hash_mode):
@@ -157,18 +171,16 @@ def preform_bruteforce(hash_mode):
     start = time.time()
     user_entries = []
     for user in get_user_list():
-        print(user)
+        print(f"testing user: {user}")
         user_start = time.time()
         tries, status = bruteforce(user, hash_mode)
         status_str = "Success" if status == LOGIN_OK else ("Locked" if status == LOGIN_LOCKED else "Fail")
         user_end = time.time() - user_start
-        user_entry = {"Username": user, "Time_elapsed": round(user_end,2), "Status": status_str}
+        user_entry = {"Username": user, "Time_elapsed": round(user_end, 2), "Status": status_str}
         user_entries.append(user_entry)
-        if tries > 0:
-            total_tries += tries
+        total_tries += tries
+        if status == "Success":
             count_success += 1
-        else:
-            total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
         if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
@@ -176,10 +188,9 @@ def preform_bruteforce(hash_mode):
     # also return analytics
     return total_tries, end, count_success, user_entries
 
+
 def main():
-    hash_modes = ["sha256", "bcrypt", "argon2id"]
-    hash_modes = hash_modes[:2]
-    with open("LOCKOUT_DEF.json","w") as file:
+    with open("LOCKOUT_DEF.json", "w") as file:
         full_json = {}
         for curr_hash in hash_modes:
             # preform bruteforce on the current hash encryption method
@@ -187,11 +198,11 @@ def main():
             # also add analytics
             total_tries, end, count_success, user_entries = result
             brute_json = {"Total_tries": total_tries,
-                          "Time_elapsed": round(end,3),
+                          "Time_elapsed": round(end, 3),
                           "Tries_per_sec": int(total_tries / end),
-                          "Success_rate": round((count_success / len(get_user_list()) * 100),2),
-                          "average_cpu_use": round(avg_cpu,2),
-                          "average_mem_use":  round(avg_mem,2),
+                          "Success_rate": round((count_success / len(get_user_list()) * 100), 2),
+                          "average_cpu_use": round(avg_cpu, 2),
+                          "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
 
             # preform password spraying on the current hash encryption method
@@ -204,9 +215,10 @@ def main():
                           "average_cpu_use": round(avg_cpu, 2),
                           "average_mem_use": round(avg_mem, 2),
                           "User_entries": user_entries}
-            crack_json = {"Bruteforce":brute_json,"Password_spraying":spray_json}
+            crack_json = {"Bruteforce": brute_json, "Password_spraying": spray_json}
             full_json[curr_hash] = crack_json
-        file.write(json.dumps(full_json,indent=4))
+        file.write(json.dumps(full_json, indent=4))
+
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,21 @@
 from flask import Flask, request, redirect, url_for, session, render_template_string, render_template, abort
 import sqlite3
+import json
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
+
+#defaults
+data = {"DB_NAME":"server.db","GROUPS_SEED":"123456"}
+with open("server.config", "r") as f:
+    data = json.load(f)
+
+DB_NAME = data["DB_NAME"]
+GROUP_SEED = data["GROUP_SEED"]
 app = Flask(__name__)
-GROUP_SEED = "506512019"
 app.secret_key = GROUP_SEED
 FAILED_ATTEMPTS = {}   # { username: count }
 MAX_TRIES = 5
-DB_NAME = "server.db"
+
 
 
 # functions for db so that each client thread has a direct access
