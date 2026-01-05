@@ -3,15 +3,25 @@ import json
 import time
 from analytics import measure_resources
 
-LOGIN_URL = "http://127.0.0.1:5000/login"
-CAPTCHA_URL = "http://127.0.0.1:5000/admin/get_captcha_token?group_seed=506512019"
-PASSWORDS_FILE = "passwords.txt"
-USERS_JSON = "users.json"
-MAX_ATTEMPTS_PER_USER = 50000
-MAX_ATTEMPTS_PER_SESSION = 1000000
+data = {}
+#defaults
+with open("client.config", "r") as f:
+    data = json.load(f)
+try:
+    LOGIN_URL = data["LOGIN_URL"]
+    PASSWORDS_FILE = data["PASSWORDS_FILE"]
+    USERS_JSON = data["USERS_JSON"]
+    MAX_ATTEMPTS_PER_USER = data["MAX_ATTEMPTS_PER_USER"]
+    MAX_ATTEMPTS_PER_SESSION = data["MAX_ATTEMPTS_PER_SESSION"]
+    TIME_LIMIT = data["TIME_LIMIT"] # in seconds
+    hash_modes = data["HASH_MODES"]
+    CAPTCHA_URL = data["CAPTCHA_URL"]
+except:
+    print("Error loading config file")
+
 session = requests.Session()
 
-def load_words(path, limit=10000):
+def load_words(path, limit=MAX_ATTEMPTS_PER_SESSION):
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         return [w.strip() for w in f if w.strip()][:limit]
 
@@ -71,12 +81,12 @@ def bruteforce(username, hash_mode):
     tries = 0
     start = time.time()
     for password in password_generator(words):
-        if try_login(username, password, hash_mode):
-            return tries
-        if (time.time() - start) >= TIME_LIMIT:
-            return -1
         tries += 1
-    return -1
+        if try_login(username, password, hash_mode):
+            return True, tries
+        if (time.time() - start) >= TIME_LIMIT:
+            return False,tries
+    return False,tries
 
 
 def get_user_list():
@@ -104,7 +114,7 @@ def password_spraying(hash_mode):
                 users.remove(user)
                 break
         # check if time limit or tries limit were exceeded
-        if tries >= MAX_ATTEMPTS_PER_SESSION or time.time() - start // 60 >= 2:
+        if tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
     print(successful_cracks)
     end = time.time() - start
@@ -125,18 +135,20 @@ def preform_bruteforce(hash_mode):
     start = time.time()
     user_entries = []
     for user in get_user_list():
-        print(user)
+        print(f"testing user: {user}")
         user_start = time.time()
-        tries = bruteforce(user, hash_mode)
+        success, tries = bruteforce(user, hash_mode)
         user_end = time.time() - user_start
-        status = "Success" if tries > 0 else "Fail"
-        user_entry = {"Username": user, "Time_elapsed": round(user_end,2), "Status": status}
+        status = "Success" if success else "Fail"
+        user_entry = {
+            "Username": user,
+            "Time_elapsed": round(user_end, 2),
+            "Status": status
+        }
         user_entries.append(user_entry)
-        if tries > 0:
-            total_tries += tries
+        total_tries += tries
+        if success:
             count_success += 1
-        else:
-            total_tries += MAX_ATTEMPTS_PER_USER
         # check if time limit or tries limit were exceeded
         if total_tries >= MAX_ATTEMPTS_PER_SESSION or (time.time() - start) >= TIME_LIMIT:
             break
@@ -145,7 +157,6 @@ def preform_bruteforce(hash_mode):
     return total_tries, end, count_success, user_entries
 
 def main():
-    hash_modes = ["sha256", "bcrypt", "argon2id"]
     with open("CAPTCHA_DEF.json","w") as file:
         full_json = {}
         for curr_hash in hash_modes:

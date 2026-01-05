@@ -1,14 +1,18 @@
 import time
-
+import json
 from flask import Flask, request, redirect, url_for, session, render_template_string
 import sqlite3
 from encryptions import verify_sha256, verify_bcrypt, verify_argon2
 
-app = Flask(__name__)
-GROUP_SEED = "506512019"
-app.secret_key = GROUP_SEED
+#defaults
+data = {"DB_NAME":"server.db","GROUPS_SEED":"123456"}
+with open("server.config", "r") as f:
+    data = json.load(f)
 
-DB_NAME = "server.db"
+DB_NAME = data["DB_NAME"]
+GROUP_SEED = data["GROUP_SEED"]
+app = Flask(__name__)
+app.secret_key = GROUP_SEED
 
 
 # functions for db so that each client thread has a direct access
