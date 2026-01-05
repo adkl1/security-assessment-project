@@ -114,7 +114,7 @@ def password_spraying(hash_mode):
         if user in successful_cracks.keys():
             user_entry = {"Username": user, "Time_elapsed": round(successful_cracks[user],2), "Status": "Success"}
         else:
-            user_entry = {"Username": user, "Time_elapsed": end, "Status": "Fail"}
+            user_entry = {"Username": user, "Time_elapsed": round(end,2), "Status": "Fail"}
         user_entries.append(user_entry)
 
     return tries, end,len(successful_cracks),user_entries
