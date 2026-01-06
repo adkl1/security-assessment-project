@@ -1,0 +1,74 @@
+{
+    "sha256": {
+        "Bruteforce": {
+            "Total_tries": 5196,
+            "Time_elapsed": 26.224,
+            "Tries_per_sec": 198,
+            "Success_rate": 100.0,
+            "average_cpu_use": 40.44,
+            "average_mem_use": 31.41,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 11.99,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 7.69,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic03",
+                    "Time_elapsed": 1.64,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic04",
+                    "Time_elapsed": 1.29,
+                    "Status": "Success"
+                },
+                {
+                    "Username": "basic05",
+                    "Time_elapsed": 3.6,
+                    "Status": "Success"
+                }
+            ]
+        },
+        "Password_spraying": {
+            "Total_tries": 5199,
+            "Time_elapsed": 24.523,
+            "Tries_per_sec": 212,
+            "Success_rate": 100.0,
+            "average_cpu_use": 35.74,
+            "average_mem_use": 31.63,
+            "User_entries": [
+                {
+                    "Username": "basic01",
+                    "Time_elapsed": 24.51,
+                    "Status": "Success But Totp Block"
+                },
+                {
+                    "Username": "basic02",
+                    "Time_elapsed": 19.97,
+                    "Status": "Success But Totp Block"
+                },
+                {
+                    "Username": "basic03",
+                    "Time_elapsed": 7.72,
+                    "Status": "Success But Totp Block"
+                },
+                {
+                    "Username": "basic04",
+                    "Time_elapsed": 6.91,
+                    "Status": "Success But Totp Block"
+                },
+                {
+                    "Username": "basic05",
+                    "Time_elapsed": 13.27,
+                    "Status": "Success But Totp Block"
+                }
+            ]
+        }
+    }
+}

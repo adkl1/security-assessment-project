@@ -157,7 +157,8 @@ def preform_bruteforce(hash_mode):
 def main():
     with open("TOTP_DEF.json", "w") as file:
         full_json = {}
-        for curr_hash in hash_modes:
+
+        for curr_hash in hash_modes[:1]:
             # preform bruteforce on the current hash encryption method
             result, avg_cpu, avg_mem = preform_bruteforce(curr_hash)
             # also add analytics
@@ -183,6 +184,7 @@ def main():
             crack_json = {"Bruteforce": brute_json, "Password_spraying": spray_json}
             full_json[curr_hash] = crack_json
         file.write(json.dumps(full_json, indent=4))
+        print(json.dumps(full_json,indent=4))
 
 
 if __name__ == "__main__":
